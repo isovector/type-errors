@@ -68,6 +68,8 @@ import GHC.TypeLits
 -- ...
 -- ... "hello", "world", and "cool"
 -- ...
+--
+-- @since 0.1.0.0
 type family PrettyPrintList (vs :: [k]) :: ErrorMessage where
   PrettyPrintList '[]       = 'Text ""
   PrettyPrintList '[a]      = ShowTypeQuoted a
@@ -87,6 +89,8 @@ type family PrettyPrintList (vs :: [k]) :: ErrorMessage where
 -- ...
 -- ... "symbols aren't quoted"
 -- ...
+--
+-- @since 0.1.0.0
 type family ShowTypeQuoted (t :: k) :: ErrorMessage where
   ShowTypeQuoted (t :: Symbol) = 'ShowType t
   ShowTypeQuoted t             = 'Text "'" ':<>: 'ShowType t ':<>: 'Text "'"
@@ -114,6 +118,8 @@ type family ShowTypeQuoted (t :: k) :: ErrorMessage where
 -- ...
 -- ... Lazy; emitted on use
 -- ...
+--
+-- @since 0.1.0.0
 type DelayError err = Eval (DelayErrorFcf err)
 
 
@@ -121,6 +127,8 @@ type DelayError err = Eval (DelayErrorFcf err)
 -- | Like 'DelayError', but implemented as a first-class family.
 -- 'DelayErrorFcf' is useful when used as the last argument to 'IfStuck' and
 -- 'UnlessStuck'.
+--
+-- @since 0.1.0.0
 data DelayErrorFcf :: ErrorMessage -> Exp k
 type instance Eval (DelayErrorFcf a) = TypeError a
 
@@ -129,12 +137,16 @@ type instance Eval (DelayErrorFcf a) = TypeError a
 -- | A helper definition that /doesn't/ emit a type error. This is
 -- occassionally useful to leave as the residual constraint in 'IfStuck' when
 -- you only want to observe if an expression /isn't/ stuck.
+--
+-- @since 0.1.0.0
 type NoError = (() :: Constraint)
 
 
 ------------------------------------------------------------------------------
 -- | Like 'NoError', but implemented as a first-class family.  'NoErrorFcf' is
 -- useful when used as the last argument to 'IfStuck' and 'UnlessStuck'.
+--
+-- @since 0.1.0.0
 type NoErrorFcf = Pure NoError
 
 
@@ -154,6 +166,8 @@ type NoErrorFcf = Pure NoError
 -- This is a generalization of <https://kcsongor.github.io/ kcsongor>'s @Break@
 -- machinery described in
 -- <https://kcsongor.github.io/report-stuck-families/ detecting the undetectable>.
+--
+-- @since 0.1.0.0
 type family IfStuck (expr :: k) (b :: k1) (c :: Exp k1) :: k1 where
   IfStuck (_ AnythingOfAnyKind) b c = b
   IfStuck a                     b c = Eval c
@@ -182,6 +196,8 @@ data AnythingOfAnyKind
 --
 -- >>> observe_no_rep True
 -- ()
+--
+-- @since 0.1.0.0
 type WhenStuck expr b   = IfStuck expr b NoErrorFcf
 
 
@@ -191,6 +207,8 @@ type WhenStuck expr b   = IfStuck expr b NoErrorFcf
 -- further.
 --
 -- See the example under 'UnlessPhantomFcf' for an example of this use-case.
+--
+-- @since 0.1.0.0
 type UnlessStuck expr c = IfStuck expr NoError c
 
 
@@ -200,7 +218,9 @@ type UnlessStuck expr c = IfStuck expr NoError c
 --
 -- 'PHANTOM' is polykinded and can be used in several settings.
 --
--- See 'UnlessPhantomFcf' for examples.
+-- See 'UnlessPhantom' for examples.
+--
+-- @since 0.1.0.0
 type PHANTOM = VAR
 
 
@@ -229,6 +249,8 @@ type PHANTOM = VAR
 --
 -- Unfortunately there is no known way to emit an error message if the variable
 -- /is/ a phantom.
+--
+-- @since 0.1.0.0
 type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 
 
@@ -269,6 +291,8 @@ type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 -- ...
 -- ... No instance for (Show ...
 -- ...
+--
+-- @since 0.1.0.0
 data UnlessPhantomFcf :: k -> ErrorMessage -> Exp Constraint
 type instance Eval (UnlessPhantomFcf exp err) =
   Coercible (SubstVar exp Stuck)
@@ -289,6 +313,8 @@ type instance Eval (UnlessPhantomFcf exp err) =
 -- >>> :kind! Subst (Either Int Bool) Either (->)
 -- ...
 -- = Int -> Bool
+--
+-- @since 0.1.0.0
 type family Subst (e :: k1) (var :: k2) (sub :: k2) :: k1 where
   Subst var var sub   = sub
   Subst (a b) var sub = Subst a var sub (Subst b var sub)
@@ -304,6 +330,8 @@ type family SubMe :: Type -> k
 -- 'VAR' is polykinded and can be used in several settings.
 --
 -- See 'SubstVar' for examples.
+--
+-- @since 0.1.0.0
 type VAR = SubMe Var
 
 
@@ -318,6 +346,8 @@ type VAR = SubMe Var
 -- >>> :kind! SubstVar (VAR Int Bool :: Type) (->)
 -- ...
 -- = Int -> Bool
+--
+-- @since 0.1.0.0
 type family SubstVar (e :: k1) (r :: k2) :: k1 where
   SubstVar (_ Var) r = r
   SubstVar (a b) r   = SubstVar a r (SubstVar b r)
