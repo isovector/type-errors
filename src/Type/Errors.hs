@@ -168,7 +168,46 @@ type NoErrorFcf = Pure NoError
 --
 -- @since 0.1.0.0
 type family IfStuck (expr :: k) (b :: k1) (c :: Exp k1) :: k1 where
-  IfStuck (_ AnythingOfAnyKind) b c = b
+  -- The type pattern @_ Foo@ is interpretered by the compiler as being of any
+  -- kind. This is great and exactly what we want here, except that things like
+  -- @forall s. Maybe s@ will get stuck here.
+  --
+  -- So instead, we just propagate out 100 of these type variables and assume
+  -- that 100 type variables ought to be enough for anyone.
+  IfStuck (_ AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind AnythingOfAnyKind AnythingOfAnyKind
+             AnythingOfAnyKind) b c = b
   IfStuck a                     b c = Eval c
 
 data AnythingOfAnyKind
@@ -287,9 +326,6 @@ type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 -- phantom!"
 --
 -- >>> observe_phantom
--- ...
--- ... No instance for (Show ...
--- ...
 --
 -- @since 0.1.0.0
 data UnlessPhantomFcf :: k -> ErrorMessage -> Exp Constraint
@@ -320,7 +356,26 @@ type family Subst (e :: k1) (var :: k2) (sub :: k2) :: k1 where
   Subst a var sub     = a
 
 data Var
-type family SubMe :: Type -> k
+type family SubMe :: Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type
+                  -> Type -> Type -> Type -> Type -> Type -> k
 
 ------------------------------------------------------------------------------
 -- | 'VAR' is a meta-varaible which marks a substitution in 'SubstVar'. The
@@ -331,7 +386,16 @@ type family SubMe :: Type -> k
 -- See 'SubstVar' for examples.
 --
 -- @since 0.1.0.0
-type VAR = SubMe Var
+type VAR = SubMe Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
+                 Var Var Var Var Var Var Var Var Var Var
 
 
 ------------------------------------------------------------------------------
@@ -348,7 +412,17 @@ type VAR = SubMe Var
 --
 -- @since 0.1.0.0
 type family SubstVar (e :: k1) (r :: k2) :: k1 where
-  SubstVar (_ Var) r = r
+  SubstVar (_ Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+              Var Var Var Var Var Var Var Var Var Var
+           ) r = r
   SubstVar (a b) r   = SubstVar a r (SubstVar b r)
   SubstVar a r       = a
 
