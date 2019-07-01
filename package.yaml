@@ -45,7 +45,6 @@ when:
     default-extensions:
       - TypeInType
 
-
 tests:
   test:
     main:                Main.hs

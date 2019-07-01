@@ -19,7 +19,6 @@ install:
  - ghc --version
 
 script:
- - cabal v2-configure
  - cabal v2-update
  - cabal v2-build
  - cabal v2-test --enable-test

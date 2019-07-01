@@ -6,6 +6,9 @@ import Test.DocTest
 
 
 main :: IO ()
+#if __GLASGOW_HASKELL__ < 804
+main = pure ()
+#elseif
 main = doctest
   [ "-isrc/"
   , "--fast"
@@ -27,4 +30,4 @@ main = doctest
 
   , "test/TypeErrors.hs"
   ]
-
+#endif
