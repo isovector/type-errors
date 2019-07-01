@@ -8,7 +8,7 @@ import Test.DocTest
 main :: IO ()
 #if __GLASGOW_HASKELL__ < 804
 main = pure ()
-#elseif
+#else
 main = doctest
   [ "-isrc/"
   , "--fast"
