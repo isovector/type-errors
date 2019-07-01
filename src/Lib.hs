@@ -33,16 +33,19 @@ module Lib
   , Pure
   ) where
 
-import Fcf
-import Data.Kind
-import GHC.TypeLits
 import Data.Coerce
+import Data.Kind
+import Fcf
+import GHC.TypeLits
+
+
 
 -- $setup
 -- >>> :m +Data.Kind
 -- >>> :m +Data.Proxy
 -- >>> import GHC.Generics (Generic (..))
 -- >>> :def! show_error (\msg -> pure $ "let foo :: DelayError (" ++ msg ++ ") => (); foo = (); in foo")
+-- >>> :def! eval_error (\msg -> pure $ "let foo :: (" ++ msg ++ ") => (); foo = (); in foo")
 -- >>> :{
 -- data HasNoRep = HasNoRep
 -- :}
@@ -139,7 +142,18 @@ type NoErrorFcf = Pure NoError
 -- | @'IfStuck' expr b c@ leaves @b@ in the residual constraints whenever
 -- @expr@ is stuck, otherwise it 'Eval'uates @c@.
 --
+-- Often you want to leave a 'DelayError' in @b@ in order to report an error
+-- when @expr@ is stuck.
 --
+-- The @c@ parameter is a first-class family, which allows you to perform
+-- arbitrarily-complicated type-level computations whenever @expr@ isn't stuck.
+-- For example, you might want to produce a typeclass 'Constraint' here.
+-- Alternatively, you can nest calls to 'IfStuck' in order to do subsequent
+-- processing.
+--
+-- This is a generalization of <https://kcsongor.github.io/ kcsongor>'s @Break@
+-- machinery described in
+-- <https://kcsongor.github.io/report-stuck-families/ detecting the undetectable>.
 type family IfStuck (expr :: k) (b :: k1) (c :: Exp k1) :: k1 where
   IfStuck (_ AnythingOfAnyKind) b c = b
   IfStuck a                     b c = Eval c
@@ -148,7 +162,8 @@ data AnythingOfAnyKind
 
 
 ------------------------------------------------------------------------------
--- |
+-- | Like 'IfStuck', but specialized to the case when you don't want to do
+-- anything if @expr@ isn't stuck.
 --
 -- >>> :{
 -- observe_no_rep
@@ -188,10 +203,42 @@ type UnlessStuck expr c = IfStuck expr NoError c
 -- See 'UnlessPhantomFcf' for examples.
 type PHANTOM = VAR
 
-type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 
 ------------------------------------------------------------------------------
--- |
+-- | @'UnlessPhantom' expr err@ determines if the type described by @expr@
+-- is phantom in the variables marked via 'PHANTOM'. If it's not, it produces
+-- the error message @err@.
+--
+-- For example, consider the definition:
+--
+-- >>> :{
+-- data Qux a b = Qux b
+-- :}
+--
+-- which is phantom in @a@:
+--
+-- >>> :eval_error UnlessPhantom (Qux PHANTOM Int) ('Text "Ok")
+-- ()
+--
+-- but not in @b@:
+--
+-- >>> :eval_error UnlessPhantom (Qux Int PHANTOM) ('Text "Bad!")
+-- ...
+-- ... Bad!
+-- ...
+--
+-- Unfortunately there is no known way to emit an error message if the variable
+-- /is/ a phantom.
+type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
+
+
+------------------------------------------------------------------------------
+-- | Like 'UnlessPhantom', but implemented as a first-class family. As such,
+-- this allows 'UnlessPhantomFcf' to be chained after 'IfStuck' to only be run
+-- if an expression isn't stuck.
+--
+-- This can be used to avoid emitting false error messages when a type variable
+-- isn't phantom, just ambiguous.
 --
 -- >>> :{
 -- observe_phantom
@@ -213,6 +260,11 @@ type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 -- ... It's not phantom!
 -- ...
 --
+-- In the next example, we leave @observe_phantom@ unsaturated, and therefore
+-- @f@ isn't yet known. Without guarding the 'UnlessPhantomFcf' behind
+-- 'UnlessStuck', this would incorrectly produce the message "It's not
+-- phantom!"
+--
 -- >>> observe_phantom
 -- ...
 -- ... No instance for (Show ...
@@ -224,7 +276,7 @@ type instance Eval (UnlessPhantomFcf exp err) =
 
 
 ------------------------------------------------------------------------------
--- |
+-- | @'Subst' expr a b@ substitutes all instances of @a@ for @b@ in @expr@.
 --
 -- >>> :kind! Subst (Either Int Int) Int Bool
 -- ...
@@ -256,7 +308,8 @@ type VAR = SubMe Var
 
 
 ------------------------------------------------------------------------------
--- |
+-- | Like 'Subst', but uses the explicit meta-variable 'VAR' to mark
+-- substitution points.
 --
 -- >>> :kind! SubstVar (Either VAR Bool) [Char]
 -- ...

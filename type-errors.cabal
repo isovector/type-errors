@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6de89c95f7383a8b1351fe9f3686101f9c5bcf2cf651e4d46343a0e011add392
+-- hash: 31f3fa50268563cab713eb4a716e6eec89a2427c3205ff80226855bbc909edea
 
 name:           type-errors
 version:        0.1.0.0
@@ -45,7 +45,6 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      TypeErrors
       Paths_type_errors
   hs-source-dirs:
       test
