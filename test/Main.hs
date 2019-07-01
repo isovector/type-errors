@@ -19,6 +19,11 @@ main = doctest
   , "-XUndecidableInstances"
   , "-XTypeApplications"
   , "-XFlexibleContexts"
+
+#if __GLASGOW_HASKELL__ < 806
+  , "-XTypeInType"
+#endif
+
   , "test/TypeErrors.hs"
   ]
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c8bf199f386243a0c4d0d44e6d61dcd9bb5492c97ad5d5d0ced0221c9983b06d
+-- hash: 2631b1d6ebf77fb98284dc78d72e09b2b299ec2ac88987e5aec5a32d8afe1150
 
 name:           type-errors
 version:        0.1.0.0
@@ -37,6 +37,8 @@ library
   build-depends:
       base >=4.7 && <5
     , first-class-families
+  if impl(ghc < 8.6)
+    default-extensions: TypeInType
   default-language: Haskell2010
 
 test-suite test
@@ -54,4 +56,6 @@ test-suite test
     , doctest >=0.16.0.1 && <0.17
     , first-class-families
     , type-errors
+  if impl(ghc < 8.6)
+    default-extensions: TypeInType
   default-language: Haskell2010
