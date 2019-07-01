@@ -1,0 +1,9 @@
+resolver: lts-13.0
+
+packages:
+- .
+
+extra-deps:
+  - first-class-families-0.5.0.0
+
+
