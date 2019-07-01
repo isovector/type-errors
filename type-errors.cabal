@@ -1,0 +1,57 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: c8bf199f386243a0c4d0d44e6d61dcd9bb5492c97ad5d5d0ced0221c9983b06d
+
+name:           type-errors
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/isovector/type-errors#readme>
+homepage:       https://github.com/isovector/type-errors#readme
+bug-reports:    https://github.com/isovector/type-errors/issues
+author:         Sandy Maguire
+maintainer:     sandy@sandymaguire.me
+copyright:      2019 Sandy Maguire
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/isovector/type-errors
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_type_errors
+  hs-source-dirs:
+      src
+  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts
+  ghc-options: -Wall
+  build-depends:
+      base >=4.7 && <5
+    , first-class-families
+  default-language: Haskell2010
+
+test-suite test
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      TypeErrors
+      Paths_type_errors
+  hs-source-dirs:
+      test
+  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , doctest >=0.16.0.1 && <0.17
+    , first-class-families
+    , type-errors
+  default-language: Haskell2010
