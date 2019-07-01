@@ -19,9 +19,9 @@ install:
  - ghc --version
 
 script:
+ - cabal new-sandbox
  - cabal v2-update
  - cabal v2-build
- - cabal v2-install
  - cabal v2-test --enable-test
  - cabal new-haddock
  # - cabal check
