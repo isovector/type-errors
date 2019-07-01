@@ -28,6 +28,7 @@ main = doctest
   , "-XTypeInType"
 #endif
 
+  , "src/Lib.hs"
   , "test/TypeErrors.hs"
   ]
 #endif
