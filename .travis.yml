@@ -23,5 +23,5 @@ script:
  - cabal v2-build
  - cabal v2-test --enable-test
  - cabal new-haddock
- # - cabal check
+ - cabal check
 

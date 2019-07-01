@@ -4,11 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8dfb17ad388c2a098b725cf0e79dbd209e5bfd7e0d5b5cfae344a54c7327df20
+-- hash: c34b99cb7785b40b9930c5de60ab842dfd436ec4458a51b595b426da5fcd4a3f
 
 name:           type-errors
 version:        0.1.0.0
+synopsis:       Tools for writing better type errors
 description:    Please see the README on GitHub at <https://github.com/isovector/type-errors#readme>
+category:       Type
 homepage:       https://github.com/isovector/type-errors#readme
 bug-reports:    https://github.com/isovector/type-errors/issues
 author:         Sandy Maguire
