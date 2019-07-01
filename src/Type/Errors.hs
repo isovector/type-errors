@@ -1,5 +1,4 @@
-
-module Lib
+module Type.Errors
   ( -- * Generating Error Messages
     ErrorMessage (..)
   , PrettyPrintList

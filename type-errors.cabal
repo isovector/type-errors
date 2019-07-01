@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 31f3fa50268563cab713eb4a716e6eec89a2427c3205ff80226855bbc909edea
+-- hash: 8dfb17ad388c2a098b725cf0e79dbd209e5bfd7e0d5b5cfae344a54c7327df20
 
 name:           type-errors
 version:        0.1.0.0
@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Type.Errors
   other-modules:
       Paths_type_errors
   hs-source-dirs:
