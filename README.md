@@ -26,7 +26,7 @@ documentation](https://hackage.haskell.org/package/type-errors/docs/Type-Errors.
 
 This project wouldn't be possible without the help of two amazing people:
 
-* [ksongor](https://kcsongor.github.io/) who came up with the original
+* [kcsongor](https://kcsongor.github.io/) who came up with the original
   technology behind this library.
 * [Lysxia](https://blog.poisson.chat/) for articulating the approach to making
   `IfStuck` work for things of all kinds, and for helping me with the
