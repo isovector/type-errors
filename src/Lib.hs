@@ -1,19 +1,36 @@
 
 module Lib
-  ( IfStuck
+  ( -- * Generating Error Messages
+    ErrorMessage (..)
+  , PrettyPrintList
+  , ShowTypeQuoted
+
+    -- * Emitting Error Messages
+  , TypeError
+  , DelayError
+  , DelayErrorFcf
+  , NoError
+  , NoErrorFcf
+
+  -- * Observing Stuckness
+  , IfStuck
   , WhenStuck
-  , DoError
+  , UnlessStuck
+
+    -- * Observing Phantomness
+  , PHANTOM
+  , UnlessPhantom
+  , UnlessPhantomFcf
+
+    -- * Performing Type Substitutions
   , Subst
   , VAR
   , SubstVar
-  , PHANTOM
-  , UnlessPhantom
-    -- * Re-exports
+
+    -- * Working With Fcfs
   , Exp
   , Eval
   , Pure
-  , TypeError
-  , ErrorMessage (..)
   ) where
 
 import Fcf
@@ -30,11 +47,17 @@ type family IfStuck (expr :: k) (b :: k1) (c :: Exp k1) :: k1 where
   IfStuck (_ AnythingOfAnyKind) b c = b
   IfStuck a                     b c = Eval c
 
-type WhenStuck a b = IfStuck a b (Pure (() :: Constraint))
+type UnlessStuck a c = IfStuck a NoError c
+type WhenStuck a b   = IfStuck a b NoErrorFcf
+
+type NoError = (() :: Constraint)
+type NoErrorFcf = Pure NoError
 
 
-data DoError :: ErrorMessage -> Exp k
-type instance Eval (DoError a) = TypeError a
+data DelayErrorFcf :: ErrorMessage -> Exp k
+type instance Eval (DelayErrorFcf a) = TypeError a
+
+type DelayError err = Eval (DelayErrorFcf err)
 
 
 data Var
@@ -44,8 +67,8 @@ type VAR = SubMe Var
 
 type family SubstVar (e :: k1) (r :: k2) :: k1 where
   SubstVar (_ Var) r = r
-  SubstVar (a b) r          = SubstVar a r (SubstVar b r)
-  SubstVar a r              = a
+  SubstVar (a b) r   = SubstVar a r (SubstVar b r)
+  SubstVar a r       = a
 
 type family Subst (e :: k1) (var :: k2) (sub :: k2) :: k1 where
   Subst var var sub   = sub
@@ -55,30 +78,23 @@ type family Subst (e :: k1) (var :: k2) (sub :: k2) :: k1 where
 
 
 
-data Phantom p = Phantom
-
 type PHANTOM = VAR
-type family UnlessPhantom (exp :: k2) (err :: ErrorMessage) where
-  UnlessPhantom exp err =
-    Coercible (SubstVar exp Stuck)
-              (SubstVar exp (Eval (DoError err)))
+data UnlessPhantomFcf :: k -> ErrorMessage -> Exp Constraint
+type instance Eval (UnlessPhantomFcf exp err) =
+  Coercible (SubstVar exp Stuck)
+            (SubstVar exp (DelayError err))
 
-type family PrettyPrint (vs :: [k]) :: ErrorMessage where
-  PrettyPrint '[]       = 'Text ""
-  PrettyPrint '[a]      = ShowTypeQuoted a
-  PrettyPrint '[a, b]   = ShowTypeQuoted a ':<>: 'Text ", and " ':<>: ShowTypeQuoted b
-  PrettyPrint (a ': vs) = ShowTypeQuoted a ':<>: 'Text ", " ':<>: PrettyPrint vs
+
+type family UnlessPhantom (exp :: k2) (err :: ErrorMessage) where
+  UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
+
+type family PrettyPrintList (vs :: [k]) :: ErrorMessage where
+  PrettyPrintList '[]       = 'Text ""
+  PrettyPrintList '[a]      = ShowTypeQuoted a
+  PrettyPrintList '[a, b]   = ShowTypeQuoted a ':<>: 'Text ", and " ':<>: ShowTypeQuoted b
+  PrettyPrintList (a ': vs) = ShowTypeQuoted a ':<>: 'Text ", " ':<>: PrettyPrintList vs
 
 type family ShowTypeQuoted (t :: k) :: ErrorMessage where
   ShowTypeQuoted (t :: Symbol) = 'ShowType t
   ShowTypeQuoted t             = 'Text "'" ':<>: 'ShowType t ':<>: 'Text "'"
-
-foo :: UnlessPhantom (f PHANTOM) ('Text "It's not phantom!") => f p -> ()
-foo _ = ()
-
-type family DOIT where
-  DOIT = TypeError (PrettyPrint '["yo", "hello"])
-
-bar :: Eval (DoError (PrettyPrint '[1, 2])) => ()
-bar = ()
 

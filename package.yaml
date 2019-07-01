@@ -40,9 +40,10 @@ default-extensions:
   - TypeApplications
   - FlexibleContexts
 
+
 tests:
-  type-errors-test:
-    main:                Spec.hs
+  test:
+    main:                Main.hs
     source-dirs:         test
     ghc-options:
     - -threaded
@@ -50,4 +51,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - type-errors
+    - doctest >= 0.16.0.1 && < 0.17
 
