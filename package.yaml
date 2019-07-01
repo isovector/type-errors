@@ -21,7 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/isov
 
 dependencies:
 - base >= 4.7 && < 5
-- first-class-families
+- first-class-families >= 0.5.0.0
 
 library:
   source-dirs: src

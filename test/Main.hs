@@ -9,6 +9,7 @@ main :: IO ()
 main = doctest
   [ "-isrc/"
   , "--fast"
+  , "-package first-class-families"
   , "-XConstraintKinds"
   , "-XDataKinds"
   , "-XKindSignatures"
