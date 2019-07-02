@@ -366,6 +366,9 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 -- phantom!"
 --
 -- >>> observe_phantom
+-- ...
+-- ... No instance for (Show (f0 p0 -> ()))
+-- ...
 --
 -- @since 0.1.0.0
 
@@ -373,15 +376,15 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 ------------------------------------------------------------------------------
 -- | @'Subst' expr a b@ substitutes all instances of @a@ for @b@ in @expr@.
 --
--- >>> :kind! Subst (Either Int Int) Int Bool
+-- >>> :kind! $(tt[t| Subst (Either Int Int) Int Bool |])
 -- ...
 -- = Either Bool Bool
 --
--- >>> :kind! Subst (Either Int Bool) Int [Char]
+-- >>> :kind! $(tt[t| Subst (Either Int Bool) Int [Char] |])
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! Subst (Either Int Bool) Either (->)
+-- >>> :kind! $(tt[t| Subst (Either Int Bool) Either (->) |])
 -- ...
 -- = Int -> Bool
 --
@@ -404,11 +407,15 @@ type family VAR :: k
 -- | Like 'Subst', but uses the explicit meta-variable 'VAR' to mark
 -- substitution points.
 --
--- >>> :kind! SubstVar (Either VAR Bool) [Char]
+-- >>> :kind! $(tt[t| SubstVar (Either VAR VAR) Bool |])
+-- ...
+-- = Either Bool Bool
+--
+-- >>> :kind! $(tt[t| SubstVar (Either VAR Bool) [Char] |])
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! SubstVar (VAR Int Bool :: Type) (->)
+-- >>> :kind! $(tt[t| SubstVar (VAR Int Bool :: Type) (->) |])
 -- ...
 -- = Int -> Bool
 --
