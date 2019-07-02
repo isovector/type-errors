@@ -16,10 +16,12 @@ module Type.Errors
   , WhenStuck
   , UnlessStuck
 
+    -- * Running Magic
+  , tt
+
     -- * Observing Phantomness
   , PHANTOM
   , UnlessPhantom
-  , UnlessPhantomFcf
 
     -- * Performing Type Substitutions
   , Subst
@@ -32,10 +34,14 @@ module Type.Errors
   , Pure
   ) where
 
-import Data.Coerce
-import Data.Kind
-import Fcf
-import GHC.TypeLits
+import           Control.Applicative
+import           Data.Coerce
+import           Data.Generics
+import           Data.Kind
+import           Fcf
+import           GHC.TypeLits
+import qualified Language.Haskell.TH as TH
+import           Language.Haskell.TH hiding (Type, Exp)
 
 
 
@@ -251,6 +257,35 @@ type UnlessStuck expr c = IfStuck expr NoError c
 
 
 ------------------------------------------------------------------------------
+-- |
+tt :: Q TH.Type -> Q TH.Type
+tt = liftA parseSubst
+
+
+replaceWhen :: Data a => TH.Type -> TH.Type -> a -> a
+replaceWhen a b = everywhere $ mkT $ \case
+  x | x == a -> b
+  x -> x
+
+
+parseSubst :: TH.Type -> TH.Type
+parseSubst (ForallT _ _ t) = parseSubst t
+parseSubst (ConT phantom `AppT` expr `AppT` msg)
+  | phantom == ''UnlessPhantom =
+    ConT ''Coercible
+      `AppT` (replaceWhen (ConT ''PHANTOM) (ConT ''Stuck) expr)
+      `AppT` (replaceWhen (ConT ''PHANTOM)
+                          (ConT ''DelayError `AppT` msg)
+                          expr)
+parseSubst (ConT subst `AppT` t `AppT` a `AppT` b)
+  | subst == ''Subst = replaceWhen a b t
+parseSubst (ConT subst `AppT` t `AppT` b)
+  | subst == ''SubstVar = replaceWhen (ConT ''VAR) b t
+parseSubst a = a
+
+
+
+------------------------------------------------------------------------------
 -- | A meta-variable for marking which argument should be a phantom when
 -- working with 'UnlessPhantom' and 'UnlessPhantomFcf'.
 --
@@ -259,7 +294,7 @@ type UnlessStuck expr c = IfStuck expr NoError c
 -- See 'UnlessPhantom' for examples.
 --
 -- @since 0.1.0.0
-type PHANTOM = VAR
+type family PHANTOM :: k
 
 
 ------------------------------------------------------------------------------
@@ -275,12 +310,12 @@ type PHANTOM = VAR
 --
 -- which is phantom in @a@:
 --
--- >>> :eval_error UnlessPhantom (Qux PHANTOM Int) ('Text "Ok")
+-- >>> :eval_error $(tt [t| UnlessPhantom (Qux PHANTOM Int) ('Text "Ok") |])
 -- ()
 --
 -- but not in @b@:
 --
--- >>> :eval_error UnlessPhantom (Qux Int PHANTOM) ('Text "Bad!")
+-- >>> :eval_error $(tt [t| UnlessPhantom (Qux Int PHANTOM) ('Text "Bad!") |])
 -- ...
 -- ... Bad!
 -- ...
@@ -289,7 +324,8 @@ type PHANTOM = VAR
 -- /is/ a phantom.
 --
 -- @since 0.1.0.0
-type UnlessPhantom k exp err = Eval (UnlessPhantomFcf k exp err)
+type family UnlessPhantom :: k -> ErrorMessage -> Constraint
+
 
 
 ------------------------------------------------------------------------------
@@ -301,12 +337,16 @@ type UnlessPhantom k exp err = Eval (UnlessPhantomFcf k exp err)
 -- isn't phantom, just ambiguous.
 --
 -- >>> :{
+-- data NotPhantomErrorFcf :: k -> Exp Constraint
+-- type instance Eval (NotPhantomErrorFcf f) =
+--   $(tt[t| UnlessPhantom (f PHANTOM) ('Text "It's not phantom!") |])
+-- :}
+--
+-- >>> :{
 -- observe_phantom
 --     :: UnlessStuck
 --          f
---          (UnlessPhantomFcf
---            (f PHANTOM)
---            ('Text "It's not phantom!"))
+--          (NotPhantomErrorFcf f)
 --     => f p
 --     -> ()
 -- observe_phantom _ = ()
@@ -328,14 +368,6 @@ type UnlessPhantom k exp err = Eval (UnlessPhantomFcf k exp err)
 -- >>> observe_phantom
 --
 -- @since 0.1.0.0
-data UnlessPhantomFcf :: k2 -> k -> ErrorMessage -> Exp Constraint
-type instance Eval (UnlessPhantomFcf k exp err) =
-  Coercible (SubstVar (Stuck :: k) exp)
-            (SubstVar (Stuck2 :: k) exp)
-
-type family Stuck2 :: k
-
-data State (s :: Type) (m :: Type -> Type) (a :: Type)
 
 
 ------------------------------------------------------------------------------
@@ -354,32 +386,7 @@ data State (s :: Type) (m :: Type -> Type) (a :: Type)
 -- = Int -> Bool
 --
 -- @since 0.1.0.0
-type family Subst (e :: k1) (var :: k2) (sub :: k2) :: k1 where
-  Subst var var sub   = sub
-  Subst (a b) var sub = Subst a var sub (Subst b var sub)
-  Subst a var sub     = a
-
-data Var
-type family SubMe :: Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type
-                  -> Type -> Type -> Type -> Type -> Type -> k
+type family Subst :: k1 -> k1 -> k2 -> k2
 
 ------------------------------------------------------------------------------
 -- | 'VAR' is a meta-varaible which marks a substitution in 'SubstVar'. The
@@ -390,16 +397,7 @@ type family SubMe :: Type -> Type -> Type -> Type -> Type
 -- See 'SubstVar' for examples.
 --
 -- @since 0.1.0.0
-type VAR = SubMe Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
-                 Var Var Var Var Var Var Var Var Var Var
+type family VAR :: k
 
 
 ------------------------------------------------------------------------------
@@ -415,18 +413,5 @@ type VAR = SubMe Var Var Var Var Var Var Var Var Var Var
 -- = Int -> Bool
 --
 -- @since 0.1.0.0
-type family SubstVar (r :: k2) (e :: k1)  :: k1 where
-  SubstVar (r :: k1) (_ Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-              Var Var Var Var Var Var Var Var Var Var
-           ) = r
-  SubstVar r (a b)   = SubstVar r a (SubstVar r b)
-  SubstVar r (a :: k)       = a
+type family SubstVar :: k1 -> k2 -> k2
 

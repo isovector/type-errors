@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 201c6c537ab5054b46ba6fbf633b1fbaa3ed103fa6ecc7e76cc6570e9303be63
+-- hash: 54a60159b6ac18a9ca40e8a8eb16aba4646948227601d35f7ec902a58d697b1c
 
 name:           type-errors
 version:        0.1.0.0
@@ -30,12 +30,11 @@ source-repository head
 library
   exposed-modules:
       Type.Errors
-      Type.Errors.TH
   other-modules:
       Paths_type_errors
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts
+  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts LambdaCase TemplateHaskellQuotes
   ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
@@ -54,7 +53,7 @@ test-suite test
       Paths_type_errors
   hs-source-dirs:
       test
-  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts
+  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts LambdaCase TemplateHaskellQuotes
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
