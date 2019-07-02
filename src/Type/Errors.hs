@@ -289,7 +289,7 @@ type PHANTOM = VAR
 -- /is/ a phantom.
 --
 -- @since 0.1.0.0
-type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
+type UnlessPhantom k exp err = Eval (UnlessPhantomFcf k exp err)
 
 
 ------------------------------------------------------------------------------
@@ -328,10 +328,14 @@ type UnlessPhantom exp err = Eval (UnlessPhantomFcf exp err)
 -- >>> observe_phantom
 --
 -- @since 0.1.0.0
-data UnlessPhantomFcf :: k -> ErrorMessage -> Exp Constraint
-type instance Eval (UnlessPhantomFcf exp err) =
-  Coercible (SubstVar exp Stuck)
-            (SubstVar exp (DelayError err))
+data UnlessPhantomFcf :: k2 -> k -> ErrorMessage -> Exp Constraint
+type instance Eval (UnlessPhantomFcf k exp err) =
+  Coercible (SubstVar (Stuck :: k) exp)
+            (SubstVar (Stuck2 :: k) exp)
+
+type family Stuck2 :: k
+
+data State (s :: Type) (m :: Type -> Type) (a :: Type)
 
 
 ------------------------------------------------------------------------------
@@ -411,8 +415,8 @@ type VAR = SubMe Var Var Var Var Var Var Var Var Var Var
 -- = Int -> Bool
 --
 -- @since 0.1.0.0
-type family SubstVar (e :: k1) (r :: k2) :: k1 where
-  SubstVar (_ Var Var Var Var Var Var Var Var Var Var
+type family SubstVar (r :: k2) (e :: k1)  :: k1 where
+  SubstVar (r :: k1) (_ Var Var Var Var Var Var Var Var Var Var
               Var Var Var Var Var Var Var Var Var Var
               Var Var Var Var Var Var Var Var Var Var
               Var Var Var Var Var Var Var Var Var Var
@@ -422,7 +426,7 @@ type family SubstVar (e :: k1) (r :: k2) :: k1 where
               Var Var Var Var Var Var Var Var Var Var
               Var Var Var Var Var Var Var Var Var Var
               Var Var Var Var Var Var Var Var Var Var
-           ) r = r
-  SubstVar (a b) r   = SubstVar a r (SubstVar b r)
-  SubstVar a r       = a
+           ) = r
+  SubstVar r (a b)   = SubstVar r a (SubstVar r b)
+  SubstVar r (a :: k)       = a
 
