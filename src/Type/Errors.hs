@@ -17,7 +17,7 @@ module Type.Errors
   , UnlessStuck
 
     -- * Running Magic
-  , tt
+  , te
 
     -- * Observing Phantomness
   , PHANTOM
@@ -258,8 +258,8 @@ type UnlessStuck expr c = IfStuck expr NoError c
 
 ------------------------------------------------------------------------------
 -- |
-tt :: Q TH.Type -> Q TH.Type
-tt = liftA parseSubst
+te :: Q TH.Type -> Q TH.Type
+te = liftA parseSubst
 
 
 replaceWhen :: Data a => TH.Type -> TH.Type -> a -> a
@@ -310,12 +310,12 @@ type family PHANTOM :: k
 --
 -- which is phantom in @a@:
 --
--- >>> :eval_error $(tt [t| UnlessPhantom (Qux PHANTOM Int) ('Text "Ok") |])
+-- >>> :eval_error $(te[t| UnlessPhantom (Qux PHANTOM Int) ('Text "Ok") |])
 -- ()
 --
 -- but not in @b@:
 --
--- >>> :eval_error $(tt [t| UnlessPhantom (Qux Int PHANTOM) ('Text "Bad!") |])
+-- >>> :eval_error $(te[t| UnlessPhantom (Qux Int PHANTOM) ('Text "Bad!") |])
 -- ...
 -- ... Bad!
 -- ...
@@ -339,7 +339,7 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 -- >>> :{
 -- data NotPhantomErrorFcf :: k -> Exp Constraint
 -- type instance Eval (NotPhantomErrorFcf f) =
---   $(tt[t| UnlessPhantom (f PHANTOM) ('Text "It's not phantom!") |])
+--   $(te[t| UnlessPhantom (f PHANTOM) ('Text "It's not phantom!") |])
 -- :}
 --
 -- >>> :{
@@ -376,15 +376,15 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 ------------------------------------------------------------------------------
 -- | @'Subst' expr a b@ substitutes all instances of @a@ for @b@ in @expr@.
 --
--- >>> :kind! $(tt[t| Subst (Either Int Int) Int Bool |])
+-- >>> :kind! $(te[t| Subst (Either Int Int) Int Bool |])
 -- ...
 -- = Either Bool Bool
 --
--- >>> :kind! $(tt[t| Subst (Either Int Bool) Int [Char] |])
+-- >>> :kind! $(te[t| Subst (Either Int Bool) Int [Char] |])
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! $(tt[t| Subst (Either Int Bool) Either (->) |])
+-- >>> :kind! $(te[t| Subst (Either Int Bool) Either (->) |])
 -- ...
 -- = Int -> Bool
 --
@@ -407,17 +407,17 @@ type family VAR :: k
 -- | Like 'Subst', but uses the explicit meta-variable 'VAR' to mark
 -- substitution points.
 --
--- >>> :kind! $(tt[t| SubstVar (Either VAR VAR) Bool |])
+-- >>> :kind! $(te[t| SubstVar (Either VAR VAR) Bool |])
 -- ...
 -- = Either Bool Bool
 --
--- >>> :kind! $(tt[t| SubstVar (Either VAR Bool) [Char] |])
+-- >>> :kind! $(te[t| SubstVar (Either VAR Bool) [Char] |])
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! $(tt[t| SubstVar (VAR Int Bool :: Type) (->) |])
+-- >>> :kind! $(te[t| SubstVar (VAR Int Bool :: Type) (,) |])
 -- ...
--- = Int -> Bool
+-- = (Int, Bool)
 --
 -- @since 0.1.0.0
 type family SubstVar :: k1 -> k2 -> k2
