@@ -174,9 +174,9 @@ type NoErrorFcf = Pure NoError
 --
 -- @since 0.1.0.0
 type family IfStuck (expr :: k) (b :: k1) (c :: Exp k1) :: k1 where
-  -- The type pattern @_ Foo@ is interpretered by the compiler as being of any
-  -- kind. This is great and exactly what we want here, except that things like
-  -- @forall s. Maybe s@ will get stuck here.
+  -- The type pattern @_ Foo@ is interpretered by the compiler as being of
+  -- any kind. This is great and exactly what we want here, except that things
+  -- like @forall s. Maybe s@ will get stuck on it.
   --
   -- So instead, we just propagate out 100 of these type variables and assume
   -- that 100 type variables ought to be enough for anyone.
@@ -257,9 +257,19 @@ type UnlessStuck expr c = IfStuck expr NoError c
 
 
 ------------------------------------------------------------------------------
--- |
+-- | This library provides tools for performing lexical substitutions over
+-- types. For example, the function 'UnlessPhantom' asks you to mark phantom
+-- variables via 'PHANTOM'.
+--
+-- Unfortunately, this substitution cannot reliably be performed via
+-- type-families, since it will too often get stuck. Instead we provide 'te',
+-- which is capable of reasoning about types symbolically.
+--
+--
+--
+-- @since 0.2.0.0
 te :: Q TH.Type -> Q TH.Type
-te = liftA parseSubst
+te = liftA $ everywhere $ mkT parseSubst
 
 
 replaceWhen :: Data a => TH.Type -> TH.Type -> a -> a
@@ -269,7 +279,6 @@ replaceWhen a b = everywhere $ mkT $ \case
 
 
 parseSubst :: TH.Type -> TH.Type
-parseSubst (ForallT _ _ t) = parseSubst t
 parseSubst (ConT phantom `AppT` expr `AppT` msg)
   | phantom == ''UnlessPhantom =
     ConT ''Coercible
@@ -284,9 +293,10 @@ parseSubst (ConT subst `AppT` t `AppT` b)
 parseSubst a = a
 
 
-
 ------------------------------------------------------------------------------
--- | A meta-variable for marking which argument should be a phantom when
+-- | __This type family is always stuck. It must be used in the context of 'te'.__
+--
+-- A meta-variable for marking which argument should be a phantom when
 -- working with 'UnlessPhantom' and 'UnlessPhantomFcf'.
 --
 -- 'PHANTOM' is polykinded and can be used in several settings.
@@ -298,7 +308,9 @@ type family PHANTOM :: k
 
 
 ------------------------------------------------------------------------------
--- | @'UnlessPhantom' expr err@ determines if the type described by @expr@
+-- | __This type family is always stuck. It must be used in the context of 'te'.__
+--
+-- @'UnlessPhantom' expr err@ determines if the type described by @expr@
 -- is phantom in the variables marked via 'PHANTOM'. If it's not, it produces
 -- the error message @err@.
 --
@@ -323,23 +335,17 @@ type family PHANTOM :: k
 -- Unfortunately there is no known way to emit an error message if the variable
 -- /is/ a phantom.
 --
--- @since 0.1.0.0
-type family UnlessPhantom :: k -> ErrorMessage -> Constraint
-
-
-
-------------------------------------------------------------------------------
--- | Like 'UnlessPhantom', but implemented as a first-class family. As such,
--- this allows 'UnlessPhantomFcf' to be chained after 'IfStuck' to only be run
--- if an expression isn't stuck.
---
--- This can be used to avoid emitting false error messages when a type variable
--- isn't phantom, just ambiguous.
+-- Often you'll want to guard 'UnlessPhantom' against 'IfStuck', to ensure you
+-- don't get errors when things are merely ambiguous. You can do this by
+-- writing your own fcf whose implementation is 'UnlessPhantom':
 --
 -- >>> :{
 -- data NotPhantomErrorFcf :: k -> Exp Constraint
 -- type instance Eval (NotPhantomErrorFcf f) =
---   $(te[t| UnlessPhantom (f PHANTOM) ('Text "It's not phantom!") |])
+--   $(te[t| UnlessPhantom (f PHANTOM)
+--                         ( ShowTypeQuoted f
+--                    ':<>: 'Text " is not phantom in its argument!")
+--         |])
 -- :}
 --
 -- >>> :{
@@ -352,29 +358,34 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 -- observe_phantom _ = ()
 -- :}
 --
+-- We then notice that using @observe_phantom@ against 'Data.Proxy.Proxy'
+-- doesn't produce any errors, but against 'Maybe' does:
+--
 -- >>> observe_phantom Proxy
 -- ()
 --
 -- >>> observe_phantom (Just 5)
 -- ...
--- ... It's not phantom!
+-- ... 'Maybe' is not phantom in its argument!
 -- ...
 --
--- In the next example, we leave @observe_phantom@ unsaturated, and therefore
--- @f@ isn't yet known. Without guarding the 'UnlessPhantomFcf' behind
--- 'UnlessStuck', this would incorrectly produce the message "It's not
--- phantom!"
+-- Finally, we leave @observe_phantom@ unsaturated, and therefore @f@ isn't yet
+-- known. Without guarding the 'UnlessPhantom' behind 'UnlessStuck', this would
+-- incorrectly produce the message "'f' is not phantom in its argument!"
 --
 -- >>> observe_phantom
 -- ...
 -- ... No instance for (Show (f0 p0 -> ()))
 -- ...
 --
--- @since 0.1.0.0
+-- @since 0.2.0.0
+type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 
 
 ------------------------------------------------------------------------------
--- | @'Subst' expr a b@ substitutes all instances of @a@ for @b@ in @expr@.
+-- | __This type family is always stuck. It must be used in the context of 'te'.__
+--
+-- @'Subst' expr a b@ substitutes all instances of @a@ for @b@ in @expr@.
 --
 -- >>> :kind! $(te[t| Subst (Either Int Int) Int Bool |])
 -- ...
@@ -384,28 +395,33 @@ type family UnlessPhantom :: k -> ErrorMessage -> Constraint
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! $(te[t| Subst (Either Int Bool) Either (->) |])
+-- >>> :kind! $(te[t| Subst (Either Int Bool) Either (,) |])
 -- ...
--- = Int -> Bool
+-- = (Int, Bool)
 --
--- @since 0.1.0.0
+-- @since 0.2.0.0
 type family Subst :: k1 -> k1 -> k2 -> k2
 
+
 ------------------------------------------------------------------------------
--- | 'VAR' is a meta-varaible which marks a substitution in 'SubstVar'. The
+-- | __This type family is always stuck. It must be used in the context of 'te'.__
+--
+-- 'VAR' is a meta-varaible which marks a substitution in 'SubstVar'. The
 -- result of @'SubstVar' expr val@ is @expr[val/'VAR']@.
 --
 -- 'VAR' is polykinded and can be used in several settings.
 --
 -- See 'SubstVar' for examples.
 --
--- @since 0.1.0.0
+-- @since 0.2.0.0
 type family VAR :: k
 
 
 ------------------------------------------------------------------------------
--- | Like 'Subst', but uses the explicit meta-variable 'VAR' to mark
--- substitution points.
+-- | __This type family is always stuck. It must be used in the context of 'te'.__
+--
+-- Like 'Subst', but uses the explicit meta-variable 'VAR' to mark substitution
+-- points.
 --
 -- >>> :kind! $(te[t| SubstVar (Either VAR VAR) Bool |])
 -- ...
@@ -415,10 +431,10 @@ type family VAR :: k
 -- ...
 -- = Either [Char] Bool
 --
--- >>> :kind! $(te[t| SubstVar (VAR Int Bool :: Type) (,) |])
+-- >>> :kind! $(te[t| SubstVar (VAR Int Bool) (,) |])
 -- ...
 -- = (Int, Bool)
 --
--- @since 0.1.0.0
+-- @since 0.2.0.0
 type family SubstVar :: k1 -> k2 -> k2
 
