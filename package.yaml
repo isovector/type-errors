@@ -1,5 +1,5 @@
 name:                type-errors
-version:             0.1.0.0
+version:             0.2.0.0
 github:              "isovector/type-errors"
 license:             BSD3
 author:              "Sandy Maguire"
@@ -31,15 +31,15 @@ ghc-options:
 default-extensions:
   - ConstraintKinds
   - DataKinds
+  - FlexibleContexts
+  - LambdaCase
   - PolyKinds
   - ScopedTypeVariables
+  - TemplateHaskellQuotes
+  - TypeApplications
   - TypeFamilies
   - TypeOperators
   - UndecidableInstances
-  - TypeApplications
-  - FlexibleContexts
-  - LambdaCase
-  - TemplateHaskellQuotes
 
 when:
   - condition: impl(ghc < 8.6)

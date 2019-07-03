@@ -1,3 +1,8 @@
+------------------------------------------------------------------------------
+-- | This module provides useful tools for writing better type-errors. For
+-- a quickstart guide to the underlying 'GHC.TypeLits.TypeError' machinery,
+-- check out Dmitrii Kovanikov's excellent blog post
+-- <https://chshersh.github.io/type-errors A story told by Type Errors>.
 module Type.Errors
   ( -- * Generating Error Messages
     ErrorMessage (..)
@@ -16,7 +21,7 @@ module Type.Errors
   , WhenStuck
   , UnlessStuck
 
-    -- * Running Magic
+    -- * Running Magic Stuck Type Families
   , te
 
     -- * Observing Phantomness
@@ -262,7 +267,7 @@ type UnlessStuck expr c = IfStuck expr NoError c
 -- variables via 'PHANTOM'.
 --
 -- Unfortunately, this substitution cannot reliably be performed via
--- type-families, since it will too often get stuck. Instead we provide 'te',
+-- type families, since it will too often get stuck. Instead we provide 'te',
 -- which is capable of reasoning about types symbolically.
 --
 -- Any type which comes with the warning /"This type family is always stuck."/

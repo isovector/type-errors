@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 54a60159b6ac18a9ca40e8a8eb16aba4646948227601d35f7ec902a58d697b1c
+-- hash: 89d18eac6ec0d221b9fa775523c8c4417ebbfa1c65bbcbf42c0f8569fd040337
 
 name:           type-errors
-version:        0.1.0.0
+version:        0.2.0.0
 synopsis:       Tools for writing better type errors
 description:    Please see the README on GitHub at <https://github.com/isovector/type-errors#readme>
 category:       Type
@@ -34,7 +34,7 @@ library
       Paths_type_errors
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts LambdaCase TemplateHaskellQuotes
+  default-extensions: ConstraintKinds DataKinds FlexibleContexts LambdaCase PolyKinds ScopedTypeVariables TemplateHaskellQuotes TypeApplications TypeFamilies TypeOperators UndecidableInstances
   ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
@@ -53,7 +53,7 @@ test-suite test
       Paths_type_errors
   hs-source-dirs:
       test
-  default-extensions: ConstraintKinds DataKinds PolyKinds ScopedTypeVariables TypeFamilies TypeOperators UndecidableInstances TypeApplications FlexibleContexts LambdaCase TemplateHaskellQuotes
+  default-extensions: ConstraintKinds DataKinds FlexibleContexts LambdaCase PolyKinds ScopedTypeVariables TemplateHaskellQuotes TypeApplications TypeFamilies TypeOperators UndecidableInstances
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
