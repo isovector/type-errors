@@ -250,7 +250,7 @@ type WhenStuck expr b   = IfStuck expr b NoErrorFcf
 -- This can be used to ensure an expression /isn't/ stuck before analyzing it
 -- further.
 --
--- See the example under 'UnlessPhantomFcf' for an example of this use-case.
+-- See the example under 'UnlessPhantom' for an example of this use-case.
 --
 -- @since 0.1.0.0
 type UnlessStuck expr c = IfStuck expr NoError c
@@ -265,7 +265,33 @@ type UnlessStuck expr c = IfStuck expr NoError c
 -- type-families, since it will too often get stuck. Instead we provide 'te',
 -- which is capable of reasoning about types symbolically.
 --
+-- Any type which comes with the warning /"This type family is always stuck."/
+-- __must__ be used in the context of 'te' and the magic @[t|@ quasiquoter. To
+-- illustrate, the following is stuck:
 --
+-- >>> :{
+-- foo :: SubstVar VAR Bool
+-- foo = True
+-- :}
+-- ...
+-- ... Couldn't match expected type ...SubstVar VAR Bool...
+-- ... with actual type ...Bool...
+-- ...
+--
+-- But running it via 'te' makes everything work:
+--
+-- >>> :{
+-- foo :: $(te[t| SubstVar VAR Bool |])
+-- foo = True
+-- :}
+--
+-- If you don't want to think about when to use 'te', it's a no-op when used
+-- with everyday types:
+--
+-- >>> :{
+-- bar :: $(te[t| Bool |])
+-- bar = True
+-- :}
 --
 -- @since 0.2.0.0
 te :: Q TH.Type -> Q TH.Type
@@ -296,8 +322,8 @@ parseSubst a = a
 ------------------------------------------------------------------------------
 -- | __This type family is always stuck. It must be used in the context of 'te'.__
 --
--- A meta-variable for marking which argument should be a phantom when
--- working with 'UnlessPhantom' and 'UnlessPhantomFcf'.
+-- A meta-variable for marking which argument should be a phantom when working
+-- with 'UnlessPhantom'.
 --
 -- 'PHANTOM' is polykinded and can be used in several settings.
 --
