@@ -15,14 +15,16 @@ main = doctest
   , "-package first-class-families"
   , "-XConstraintKinds"
   , "-XDataKinds"
+  , "-XFlexibleContexts"
   , "-XKindSignatures"
+  , "-XLambdaCase"
   , "-XPolyKinds"
   , "-XScopedTypeVariables"
+  , "-XTemplateHaskell"
+  , "-XTypeApplications"
   , "-XTypeFamilies"
   , "-XTypeOperators"
   , "-XUndecidableInstances"
-  , "-XTypeApplications"
-  , "-XFlexibleContexts"
 
 #if __GLASGOW_HASKELL__ < 806
   , "-XTypeInType"
