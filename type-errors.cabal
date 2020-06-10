@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 89d18eac6ec0d221b9fa775523c8c4417ebbfa1c65bbcbf42c0f8569fd040337
+-- hash: fbae143f903ee2d23e10e0e09493c17ef5c0977d585e416cd9d581af1aee5890
 
 name:           type-errors
 version:        0.2.0.0
@@ -57,7 +57,7 @@ test-suite test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , doctest >=0.16.0.1 && <0.17
+    , doctest >=0.16.0.1 && <0.18
     , first-class-families >=0.5.0.0
     , syb
     , template-haskell

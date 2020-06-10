@@ -56,5 +56,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - type-errors
-    - doctest >= 0.16.0.1 && < 0.17
+    - doctest >= 0.16.0.1 && < 0.18
 
