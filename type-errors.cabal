@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fbae143f903ee2d23e10e0e09493c17ef5c0977d585e416cd9d581af1aee5890
+-- hash: 1d1902e56642eacd42317b04c22e9583764e08fc7660be5e70c0e4ad398b537d
 
 name:           type-errors
 version:        0.2.0.0
@@ -57,7 +57,7 @@ test-suite test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , doctest >=0.16.0.1 && <0.18
+    , doctest >=0.16.0.1 && <0.19
     , first-class-families >=0.5.0.0
     , syb
     , template-haskell
