@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1d1902e56642eacd42317b04c22e9583764e08fc7660be5e70c0e4ad398b537d
+-- hash: 8d43fa66b075fb483712efbb675c1e29fb2c75211d8b74e8a19c41f49ba71350
 
 name:           type-errors
 version:        0.2.0.0
@@ -34,7 +34,18 @@ library
       Paths_type_errors
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds DataKinds FlexibleContexts LambdaCase PolyKinds ScopedTypeVariables TemplateHaskellQuotes TypeApplications TypeFamilies TypeOperators UndecidableInstances
+  default-extensions:
+      ConstraintKinds
+      DataKinds
+      FlexibleContexts
+      LambdaCase
+      PolyKinds
+      ScopedTypeVariables
+      TemplateHaskellQuotes
+      TypeApplications
+      TypeFamilies
+      TypeOperators
+      UndecidableInstances
   ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
@@ -43,7 +54,8 @@ library
     , template-haskell
     , th-abstraction
   if impl(ghc < 8.6)
-    default-extensions: TypeInType
+    default-extensions:
+        TypeInType
   default-language: Haskell2010
 
 test-suite test
@@ -53,16 +65,28 @@ test-suite test
       Paths_type_errors
   hs-source-dirs:
       test
-  default-extensions: ConstraintKinds DataKinds FlexibleContexts LambdaCase PolyKinds ScopedTypeVariables TemplateHaskellQuotes TypeApplications TypeFamilies TypeOperators UndecidableInstances
+  default-extensions:
+      ConstraintKinds
+      DataKinds
+      FlexibleContexts
+      LambdaCase
+      PolyKinds
+      ScopedTypeVariables
+      TemplateHaskellQuotes
+      TypeApplications
+      TypeFamilies
+      TypeOperators
+      UndecidableInstances
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , doctest >=0.16.0.1 && <0.19
+    , doctest >=0.16.0.1 && <0.20
     , first-class-families >=0.5.0.0
     , syb
     , template-haskell
     , th-abstraction
     , type-errors
   if impl(ghc < 8.6)
-    default-extensions: TypeInType
+    default-extensions:
+        TypeInType
   default-language: Haskell2010
