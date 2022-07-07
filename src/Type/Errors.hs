@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 ------------------------------------------------------------------------------
 -- | This module provides useful tools for writing better type-errors. For
 -- a quickstart guide to the underlying 'GHC.TypeLits.TypeError' machinery,
@@ -101,6 +103,9 @@ type family PrettyPrintList (vs :: [k]) :: ErrorMessage where
 -- ...
 --
 -- @since 0.1.0.0
+#if __GLASGOW_HASKELL__ >= 902
+type ShowTypeQuoted :: k -> ErrorMessage
+#endif
 type family ShowTypeQuoted (t :: k) :: ErrorMessage where
   ShowTypeQuoted (t :: Symbol) = 'ShowType t
   ShowTypeQuoted t             = 'Text "'" ':<>: 'ShowType t ':<>: 'Text "'"
