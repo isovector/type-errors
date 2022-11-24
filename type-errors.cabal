@@ -3,11 +3,9 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 8d43fa66b075fb483712efbb675c1e29fb2c75211d8b74e8a19c41f49ba71350
 
 name:           type-errors
-version:        0.2.0.0
+version:        0.2.0.1
 synopsis:       Tools for writing better type errors
 description:    Please see the README on GitHub at <https://github.com/isovector/type-errors#readme>
 category:       Type
@@ -83,7 +81,7 @@ test-suite test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , doctest >=0.16.0.1 && <0.20
+    , doctest >=0.16.0.1 && <0.21
     , first-class-families >=0.5.0.0
     , syb
     , template-haskell
