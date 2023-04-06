@@ -411,7 +411,11 @@ type family PHANTOM :: k
 --
 -- >>> observe_phantom
 -- ...
+#if __GLASGOW_HASKELL__ >= 906
+-- ... No instance for ‘Show (f0 p0 -> ())’
+#else
 -- ... No instance for (Show (f0 p0 -> ()))
+#endif
 -- ...
 --
 -- @since 0.2.0.0
