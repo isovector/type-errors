@@ -1,5 +1,9 @@
 # Changelog for type-errors
 
+## 0.2.0.2 (2023-04-08)
+
+- Bumped version bounds
+
 ## 0.2.0.1 (2022-11-24)
 
 - Bumped version bounds
