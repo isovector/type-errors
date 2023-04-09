@@ -1,6 +1,7 @@
 # type-errors
 
-[![Hackage](https://img.shields.io/hackage/v/type-errors.svg?logo=haskell&label=type-errors)](https://hackage.haskell.org/package/type-errors)
+[![Haskell-CI](https://github.com/isovector/type-errors/actions/workflows/haskell-ci.yml/badge.svg)](https://github.com/isovector/type-errors/actions/workflows/haskell-ci.yml)
+[![Hackage](https://img.shields.io/hackage/v/type-errors.svg?logo=haskell&label=type-errors&color=informational)](https://hackage.haskell.org/package/type-errors)
 
 ## Dedication
 
@@ -30,4 +31,3 @@ This project wouldn't be possible without the help of two amazing people:
 * [Lysxia](https://blog.poisson.chat/) for articulating the approach to making
   `IfStuck` work for things of all kinds, and for helping me with the
   substitution machinery.
-
