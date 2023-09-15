@@ -92,7 +92,7 @@ test-suite test
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.9 && <5
-    , doctest >=0.16.0.1 && <0.22
+    , doctest >=0.16.0.1 && <0.23
     , first-class-families >=0.5.0.0
     , syb
     , template-haskell
